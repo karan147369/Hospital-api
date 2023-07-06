@@ -1,5 +1,35 @@
 const express = require("express");
-const routing = express.Router;
+const routing = express.Router();
+const { verifyDoctor } = require('../controller');
 
-routing.get("/", async (req, res, next) => {});
+
+routing.get("/doctors/login", async (req, res, next) => {
+    const response = await verifyDoctor(req.username, req.password);
+});
+
+routing.post("/doctors/register", async (req, res, next) => {
+    const response = await registerDoctor();
+});
+
+routing.post("/patients/register", async (req, res, next) => {
+    const response = await registerPatient();
+});
+routing.get("/patients/:id/create_report", async (req, res, next) => {
+    const response = await createReport();
+});
+
+routing.get("/patients/:id/all_reports", async (req, res, next) => {
+    const response = await allReports();
+});
+
+routing.get("/reports/:status", async (req, res, next) => {
+
+});
+
+
+
+
+
+
+
 module.exports = routing;
