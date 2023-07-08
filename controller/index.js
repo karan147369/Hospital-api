@@ -14,7 +14,7 @@ controller.verifyDoctor = async function (username, password) {
 };
 
 controller.registerDoctor = async function (username, password) {
-  //first verify is username is unique or not
+  // verify if username is unique or not
   await client.connect();
   const res = await client
     .db("Hospital")
@@ -34,12 +34,32 @@ controller.registerDoctor = async function (username, password) {
       username,
       password,
     };
-    const token = jwt.sign(user, appData.JsonSecretKey);
-    return { success: true, token: token };
-  } else return { success: false, message: "something went wrong" };
+    try {
+      const token = jwt.sign(user, appData.JsonSecretKey);
+      return { success: true, token: token };
+    } catch (err) {
+      return { success: false, message: err.message };
+    }
+  }
 };
 
-controller.registerPatient = async function (username, password) {};
+controller.registerPatient = async function (phoneNo, name, token) {
+  //check if patient already exists
+  const res = await client
+    .db("Hospital")
+    .collection("patients")
+    .findOne({ phoneNo: phoneNo });
+  if (res !== null) return { success: false, message: "Patient already exits" };
+
+  //Register patient
+
+  const register = await client
+    .db("Hospital")
+    .collection("patients")
+    .insertOne({ phoneNo: phoneNo, name: name });
+  if (register !== null) return { success: true, phoneNo: phoneNo };
+  else return { success: false, message: "Unexpected error" };
+};
 
 controller.createReport = async function (username, password) {};
 controller.allReports = async function (username, password) {};

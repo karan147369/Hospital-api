@@ -1,6 +1,7 @@
 const express = require("express");
 const routing = express.Router();
 const controller = require("../controller");
+const Auth = require("../Auth");
 
 routing.get("/doctors/login", async (req, res, next) => {
   const response = await controller.verifyDoctor(
@@ -20,10 +21,20 @@ routing.post("/doctors/register", async (req, res, next) => {
   else return res.json({ success: false, message: response.message });
 });
 
-routing.post("/patients/register", async (req, res, next) => {
-  const response = await controller.registerPatient();
-});
-routing.get("/patients/:id/create_report", async (req, res, next) => {
+routing.post(
+  "/patients/register",
+  (req, res, next) => Auth.authDoctor(req.body.token, next),
+  async (req, res, next) => {
+    const response = await controller.registerPatient(
+      req.body.phoneNo,
+      req.body.name,
+      req.body.token
+    );
+    if (response.success) res.json({ phoneNo: response.phoneNo });
+    else res.json({ success: false, message: response.message });
+  }
+);
+routing.post("/patients/:id/create_report", async (req, res, next) => {
   const response = await controller.createReport();
 });
 
