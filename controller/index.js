@@ -43,7 +43,7 @@ controller.registerDoctor = async function (username, password) {
   }
 };
 
-controller.registerPatient = async function (phoneNo, name, token) {
+controller.registerPatient = async function (phoneNo, name) {
   //check if patient already exists
   const res = await client
     .db("Hospital")
@@ -61,6 +61,28 @@ controller.registerPatient = async function (phoneNo, name, token) {
   else return { success: false, message: "Unexpected error" };
 };
 
-controller.createReport = async function (username, password) {};
+controller.createReport = async function (token, id, status) {
+  const decode = jwt.decode(token, appData.JsonSecretKey);
+  const date = new Date();
+  const register = await client
+    .db("Hospital")
+    .collection("reports")
+    .insertOne({
+      patient_number: id,
+      report: { doctor: decode.useranme, status: status, date: date },
+    });
+  console.log(register);
+  if (register !== null)
+    return {
+      success: true,
+      report: {
+        patient_number: id,
+        doctor: decode.username,
+        status: status,
+        date: date,
+      },
+    };
+  else return { success: false, message: "Unexpected error" };
+};
 controller.allReports = async function (username, password) {};
 module.exports = controller;

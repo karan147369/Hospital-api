@@ -27,16 +27,32 @@ routing.post(
   async (req, res, next) => {
     const response = await controller.registerPatient(
       req.body.phoneNo,
-      req.body.name,
-      req.body.token
+      req.body.name
     );
     if (response.success) res.json({ phoneNo: response.phoneNo });
     else res.json({ success: false, message: response.message });
   }
 );
-routing.post("/patients/:id/create_report", async (req, res, next) => {
-  const response = await controller.createReport();
-});
+routing.post(
+  `/patients/:id/create_report`,
+  (req, res, next) => Auth.authDoctor(res, req.body.token, next),
+  async (req, res, next) => Auth.isPatientRegistered(res, req.params.id, next),
+  async (req, res, next) => {
+    const response = await controller.createReport(
+      req.body.token,
+      req.params.id,
+      req.body.status
+    );
+    if (response.success)
+      res.json({
+        patient_number: response.report.patient_number,
+        doctor: response.report.doctor,
+        status: response.report.status,
+        date: response.report.date,
+      });
+    else res.json({ success: false });
+  }
+);
 
 routing.get("/patients/:id/all_reports", async (req, res, next) => {
   const response = await controller.allReports();
