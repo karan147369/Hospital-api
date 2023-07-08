@@ -69,9 +69,8 @@ controller.createReport = async function (token, id, status) {
     .collection("reports")
     .insertOne({
       patient_number: id,
-      report: { doctor: decode.useranme, status: status, date: date },
+      report: { doctor: decode.username, status: status, date: date },
     });
-  console.log(register);
   if (register !== null)
     return {
       success: true,
@@ -84,5 +83,36 @@ controller.createReport = async function (token, id, status) {
     };
   else return { success: false, message: "Unexpected error" };
 };
-controller.allReports = async function (username, password) {};
+controller.allReports = async function (id) {
+  const response = await client
+    .db("Hospital")
+    .collection("reports")
+    .aggregate([
+      { $match: { patient_number: id } },
+      {
+        $group: { _id: "$patient_number", reports: { $push: "$report" } },
+      },
+    ])
+    .toArray();
+
+  if (response.length === 0)
+    return { empty: true, message: `No report found for patient_no: ${id}` };
+  else return { empty: false, data: response };
+};
+controller.allReportsStatusWise = async (status) => {
+  const response = await client
+    .db("Hospital")
+    .collection("reports")
+    .aggregate([
+      { $match: { "report.status": status } },
+      {
+        $group: { _id: "$patient_number", reports: { $push: "$report" } },
+      },
+    ])
+    .toArray();
+
+  if (response.length === 0)
+    return { empty: true, message: `No report found for status: ${status}` };
+  else return { empty: false, data: response };
+};
 module.exports = controller;

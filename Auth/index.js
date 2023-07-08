@@ -15,7 +15,7 @@ Auth.isPatientRegistered = async (res, id, next) => {
   const check = await client
     .db("Hospital")
     .collection("patients")
-    .findOne({ phoneNo: id });
+    .find({ phoneNo: id });
   if (check === null)
     res.json({
       success: false,

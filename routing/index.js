@@ -54,10 +54,25 @@ routing.post(
   }
 );
 
-routing.get("/patients/:id/all_reports", async (req, res, next) => {
-  const response = await controller.allReports();
-});
+routing.get(
+  "/patients/:id/all_reports",
+  (req, res, next) => Auth.authDoctor(res, req.body.token, next),
+  async (req, res, next) => {
+    const response = await controller.allReports(req.params.id);
 
-routing.get("/reports/:status", async (req, res, next) => {});
+    if (response.empty) res.json({ message: response.message });
+    else res.send(response.data);
+  }
+);
+
+routing.get(
+  "/reports/:status",
+  (req, res, next) => Auth.authDoctor(res, req.body.token, next),
+  async (req, res, next) => {
+    const response = await controller.allReportsStatusWise(req.params.status);
+    if (response.empty) res.json({ message: response.message });
+    else res.send(response.data);
+  }
+);
 
 module.exports = routing;
