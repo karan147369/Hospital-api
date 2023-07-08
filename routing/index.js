@@ -3,11 +3,21 @@ const routing = express.Router();
 const controller = require("../controller");
 
 routing.get("/doctors/login", async (req, res, next) => {
-  const response = await controller.verifyDoctor(req.username, req.password);
+  const response = await controller.verifyDoctor(
+    req.body.username,
+    req.body.password
+  );
+  res.json({ success: response.success });
 });
 
 routing.post("/doctors/register", async (req, res, next) => {
-  const response = await controller.registerDoctor();
+  const response = await controller.registerDoctor(
+    req.body.username,
+    req.body.password
+  );
+  if (response.success)
+    return res.status(200).json({ success: true, token: response.token });
+  else return res.json({ success: false, message: response.message });
 });
 
 routing.post("/patients/register", async (req, res, next) => {
