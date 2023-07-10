@@ -8,7 +8,7 @@ routing.get("/doctors/login", async (req, res, next) => {
     req.body.username,
     req.body.password
   );
-  res.json({ success: response.success });
+  res.json({ success: response.success, token: response.token });
 });
 
 routing.post("/doctors/register", async (req, res, next) => {

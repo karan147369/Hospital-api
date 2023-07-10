@@ -9,8 +9,11 @@ controller.verifyDoctor = async function (username, password) {
     .db("Hospital")
     .collection("doctors")
     .findOne({ username: username, password: password });
-  if (response !== null) return { success: true };
-  else return { success: false };
+  if (response !== null) {
+    const user = { username: username, password: password };
+    const token = jwt.sign(user, appData.JsonSecretKey);
+    return { success: true, token: token };
+  } else return { success: false };
 };
 
 controller.registerDoctor = async function (username, password) {
