@@ -51,8 +51,10 @@ controller.registerPatient = async function (phoneNo, name) {
   const res = await client
     .db("Hospital")
     .collection("patients")
-    .findOne({ phoneNo: phoneNo });
-  if (res !== null) return { success: false, message: "Patient already exits" };
+    .find({ phoneNo: phoneNo })
+    .toArray();
+  if (res.length >= 1)
+    return { success: false, message: "Patient already exits" };
 
   //Register patient
 
@@ -66,6 +68,22 @@ controller.registerPatient = async function (phoneNo, name) {
 
 controller.createReport = async function (token, id, status) {
   const decode = jwt.decode(token, appData.JsonSecretKey);
+
+  // check if patient exists
+  const res = await client
+    .db("Hospital")
+    .collection("patients")
+    .find({ phoneNo: parseInt(id) })
+    .toArray();
+
+  console.log(typeof id);
+  if (res.length === 0)
+    return {
+      success: false,
+      message:
+        "Patient doesn't exits! Please register the patient first before generating report.",
+    };
+
   const date = new Date();
   const register = await client
     .db("Hospital")

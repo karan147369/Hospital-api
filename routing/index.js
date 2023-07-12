@@ -23,12 +23,13 @@ routing.post("/doctors/register", async (req, res, next) => {
 
 routing.post(
   "/patients/register",
-  (req, res, next) => Auth.authDoctor(req.body.token, next),
+  (req, res, next) => Auth.authDoctor(res, req.body.token, next),
   async (req, res, next) => {
     const response = await controller.registerPatient(
       req.body.phoneNo,
       req.body.name
     );
+    console.log(response);
     if (response.success) res.json({ phoneNo: response.phoneNo });
     else res.json({ success: false, message: response.message });
   }
@@ -36,7 +37,6 @@ routing.post(
 routing.post(
   `/patients/:id/create_report`,
   (req, res, next) => Auth.authDoctor(res, req.body.token, next),
-  async (req, res, next) => Auth.isPatientRegistered(res, req.params.id, next),
   async (req, res, next) => {
     const response = await controller.createReport(
       req.body.token,
@@ -50,7 +50,7 @@ routing.post(
         status: response.report.status,
         date: response.report.date,
       });
-    else res.json({ success: false });
+    else res.json({ success: false, message: response.message });
   }
 );
 
@@ -59,7 +59,6 @@ routing.get(
   (req, res, next) => Auth.authDoctor(res, req.body.token, next),
   async (req, res, next) => {
     const response = await controller.allReports(req.params.id);
-
     if (response.empty) res.json({ message: response.message });
     else res.send(response.data);
   }
