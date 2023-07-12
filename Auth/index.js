@@ -11,17 +11,7 @@ Auth.authDoctor = (res, token, next) => {
     res.json({ success: false, message: err.message });
   }
 };
-Auth.isPatientRegistered = async (res, id, next) => {
-  const check = await client
-    .db("Hospital")
-    .collection("patients")
-    .find({ phoneNo: id });
-  if (check === null)
-    res.json({
-      success: false,
-      message:
-        "Patient doesn't exits! Please register the patient first before generating report.",
-    });
-  else next();
-};
+// Auth.isPatientRegistered = async (res, id, next) => {
+//
+// };
 module.exports = Auth;
