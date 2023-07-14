@@ -5,6 +5,12 @@ const route = require("./routing");
 const bodyParser = require("body-parser");
 
 app.use(bodyParser.json());
-app.use("/", route);
+app.use(
+  "/",
+  (req, res, next) => {
+    console.log("Connected to server");
+  },
+  route
+);
 app.use(cors);
 app.listen(4000);
