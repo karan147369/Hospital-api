@@ -73,5 +73,8 @@ routing.get(
     else res.send(response.data);
   }
 );
+routing.get("*", () => {
+  res.send(true);
+});
 
 module.exports = routing;
