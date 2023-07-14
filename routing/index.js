@@ -73,7 +73,7 @@ routing.get(
     else res.send(response.data);
   }
 );
-routing.get("*", () => {
+routing.get("*", (req, res) => {
   res.send(true);
 });
 
